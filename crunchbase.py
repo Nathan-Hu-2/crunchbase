@@ -1,17 +1,8 @@
-from py_crunchbase import PyCrunchbase
-from py_crunchbase.apis.search.predicates import Currency
+import requests
+import timeit
 
-pycb = PyCrunchbase('0fea1a1aa26cb1c4dc60bf758a208f51')
-api = pycb.search_funding_rounds_api()
+API = 'https://api.crunchbase.com/api/v4/entities/organizations/airbnb?card_ids=[founders,raised_funding_rounds]&field_ids=[categories,short_description,rank_org_company]&user_key=0fea1a1aa26cb1c4dc60bf758a208f51'
 
-api.select(
-    'name', 'short_description'
-).where(
-    announced_on__gte=2012, num_investors__lte=4, money_raised__gte=Currency(10000000)
-).order_by(
-    'announced_on'
-)
-
-for page in api.iterate():
-    for funding_round in page:
-        print(funding_round.permalink)
+res = requests.get(API)
+print(res.status_code)
+print(res.text)
