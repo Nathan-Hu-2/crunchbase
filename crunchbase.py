@@ -15,6 +15,8 @@ from csv import writer
 
 base_url = 'https://www.crunchbase.com/organization/pipe'
 technology_url = 'https://www.crunchbase.com/organization/pipe/technology'
+signals_url = 'https://www.crunchbase.com/organization/pipe/technology'
+
 
 headers = {'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:66.0) Gecko/20100101 Firefox/66.0", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
 
@@ -40,10 +42,15 @@ with open('crunchbase.csv', 'w', encoding='utf8', newline='') as f:
     total_funding = soup_base.find('span', class_="component--field-formatter field-type-money ng-star-inserted").text
     founded = soup_base.find('span', class_="component--field-formatter field-type-date_precision ng-star-inserted").text
 
-    monthly_site_visits = soup_tech.find_all('span', class_="component--field-formatter field-type-integer ng-star-inserted")
+    i = 0
+    while i < 3:
+        list = soup_tech.find_all('span', class_="component--field-formatter field-type-integer ng-star-inserted")
+        monthly_site_visits = list[2].text
+        i += 1
 
+    monthly_visits_growth = soup_tech.find('span', class_="component--field-formatter field-type-decimal ng-star-inserted").text
 
-    info = [company_name, company_description, total_funding, founded, monthly_site_visits]
+    info = [company_name, company_description, total_funding, founded, monthly_site_visits, monthly_visits_growth]
     print(info)
     theWriter.writerow(info)
 
