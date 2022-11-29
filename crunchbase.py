@@ -27,56 +27,72 @@ def switchIP():
 start = time.time()
 
 def delay() -> None:
-    time.sleep(random.uniform(0.100, 0.300))
+    time.sleep(random.uniform(2, 7))
     return None
 
-companies = ['pipe']
+companies = ['pipe', 'google', 'airbnb', 'facebook', 'fakkerererererp']
 
 for company in companies:
-    # switchIP()
-    base_url = f'https://www.crunchbase.com/organization/{company}'
-    technology_url = f'https://www.crunchbase.com/organization/{company}/technology'
-    signals_url = f'https://www.crunchbase.com/organization/{company}/signals_and_news'
+    try:
+        # switchIP()
+        base_url = f'https://www.crunchbase.com/organization/{company}'
+        technology_url = f'https://www.crunchbase.com/organization/{company}/technology'
+        signals_url = f'https://www.crunchbase.com/organization/{company}/signals_and_news'
 
-    headers = {'User-Agent': UserAgent().random, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
+        headers = {'User-Agent': UserAgent().random, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
 
-    res = requests.get(base_url, headers=headers)
-    soup_base = BeautifulSoup(res.text, 'html.parser')
-    print(res.status_code)
+        payload = {
+            'api_key': 'c794899b092324ebc72c168409214828',
+            'url': base_url,
+        }
+        html = requests.get('http://api.scraperapi.com', params=payload)
+        soup_base = BeautifulSoup(html.text, 'html.parser')
+        print(html.status_code)
 
-    # Grab Tech Related Information
-    res = requests.get(technology_url, headers=headers)
-    soup_tech = BeautifulSoup(res.text, 'html.parser')
+        # Grab Tech Related Information
+        payload = {
+            'api_key': 'c794899b092324ebc72c168409214828',
+            'url': technology_url,
+        }    
+        html = requests.get('http://api.scraperapi.com', params=payload)
+        soup_tech = BeautifulSoup(html.text, 'html.parser')
 
-    # Grab Signal & News Related Information
-    res = requests.get(signals_url, headers=headers)
-    soup_signal = BeautifulSoup(res.text, 'html.parser')
+        # Grab Signal & News Related Information
+        payload = {
+            'api_key': 'c794899b092324ebc72c168409214828',
+            'url': signals_url,
+        } 
+        html = requests.get('http://api.scraperapi.com', params=payload)
+        soup_signal = BeautifulSoup(html.text, 'html.parser')
 
-    # print(company_info)
-    with open('crunchbase.csv', 'w', encoding='utf8', newline='') as f:
-        theWriter = writer(f)
-        header = ['Company Name', 'Description', 'Funding', 'Founded', 'Monthly Site Visits', 'Monthly Visits Growth', 'Number of Articles']
+        # print(company_info)
+        with open('crunchbase.csv', 'a', encoding='utf8', newline='') as f:
+            theWriter = writer(f)
+            header = ['Company Name', 'Description', 'Funding', 'Founded', 'Monthly Site Visits', 'Monthly Visits Growth', 'Number of Articles']
 
-        theWriter.writerow(header)
+            theWriter.writerow(header)
 
-        company_name = soup_base.find('h1', class_="profile-name").text
-        company_description = soup_base.find('span', class_="description").text
-        total_funding = soup_base.find('span', class_="component--field-formatter field-type-money ng-star-inserted").text
-        founded = soup_base.find('span', class_="component--field-formatter field-type-date_precision ng-star-inserted").text
+            company_name = soup_base.find('h1', class_="profile-name").text
+            company_description = soup_base.find('span', class_="description").text
+            total_funding = soup_base.find('span', class_="component--field-formatter field-type-money ng-star-inserted").text
+            founded = soup_base.find('span', class_="component--field-formatter field-type-date_precision ng-star-inserted").text
 
-        i = 0
-        while i < 3:
-            list = soup_tech.find_all('span', class_="component--field-formatter field-type-integer ng-star-inserted")
-            monthly_site_visits = list[2].text
-            i += 1
+            i = 0
+            while i < 3:
+                list = soup_tech.find_all('span', class_="component--field-formatter field-type-integer ng-star-inserted")
+                monthly_site_visits = list[2].text
+                i += 1
 
-        monthly_visits_growth = soup_tech.find('span', class_="component--field-formatter field-type-decimal ng-star-inserted").text
+            monthly_visits_growth = soup_tech.find('span', class_="component--field-formatter field-type-decimal ng-star-inserted").text
 
-        num_articles = soup_signal.find('a', class_="component--field-formatter field-type-integer link-accent ng-star-inserted").text
+            num_articles = soup_signal.find('a', class_="component--field-formatter field-type-integer link-accent ng-star-inserted").text
 
-        info = [company_name, company_description, total_funding, founded, monthly_site_visits, monthly_visits_growth, num_articles]
-        theWriter.writerow(info)
-        switchIP()
+            info = [company_name, company_description, total_funding, founded, monthly_site_visits, monthly_visits_growth, num_articles]
+
+            theWriter.writerow(info)
+            # switchIP()
+    except:
+        print(company + 'not found')
 
 end = time.time()
 print(end - start)
