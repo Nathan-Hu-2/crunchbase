@@ -24,28 +24,31 @@ def switchIP():
         controller.authenticate()
         controller.signal(Signal.NEWNYM)
 
-start = time.time()
-
 def delay() -> None:
     time.sleep(random.uniform(2, 7))
     return None
 
-companies = ['pipe', 'google', 'airbnb', 'facebook', 'fakkerererererp']
+# companies = ['pipe', 'google', 'airbnb', 'facebook', 'fakkerererererp']
+companies = ['pipe']
+
+header_added = False
 
 for company in companies:
     try:
-        # switchIP()
         base_url = f'https://www.crunchbase.com/organization/{company}'
         technology_url = f'https://www.crunchbase.com/organization/{company}/technology'
         signals_url = f'https://www.crunchbase.com/organization/{company}/signals_and_news'
+        # headers = {'User-Agent': UserAgent().random, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
 
-        headers = {'User-Agent': UserAgent().random, "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
-
+        # What gets sent to scraperAPI
         payload = {
             'api_key': 'c794899b092324ebc72c168409214828',
             'url': base_url,
         }
-        html = requests.get('http://api.scraperapi.com', params=payload)
+        start = time.time()
+        html = requests.get('http://async.scraperapi.com', params=payload)
+        end = time.time()
+
         soup_base = BeautifulSoup(html.text, 'html.parser')
         print(html.status_code)
 
@@ -70,7 +73,9 @@ for company in companies:
             theWriter = writer(f)
             header = ['Company Name', 'Description', 'Funding', 'Founded', 'Monthly Site Visits', 'Monthly Visits Growth', 'Number of Articles']
 
-            theWriter.writerow(header)
+            # if not header_added:
+            #     theWriter.writerow(header)
+            #     heaeder_added = True
 
             company_name = soup_base.find('h1', class_="profile-name").text
             company_description = soup_base.find('span', class_="description").text
@@ -94,7 +99,6 @@ for company in companies:
     except:
         print(company + 'not found')
 
-end = time.time()
 print(end - start)
 
 # print("Company Name:", company_name)
